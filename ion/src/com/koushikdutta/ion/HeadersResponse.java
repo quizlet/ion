@@ -35,4 +35,8 @@ public class HeadersResponse {
         this.message = message;
         return this;
     }
+
+	public String toString() {
+		return "Code: " + code() + "\nMessage: " + message() + "\nHeaders: " + getHeaders();
+	}
 }
