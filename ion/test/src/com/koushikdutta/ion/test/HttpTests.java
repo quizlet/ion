@@ -18,6 +18,7 @@ import com.koushikdutta.async.http.server.AsyncHttpServerRequest;
 import com.koushikdutta.async.http.server.AsyncHttpServerResponse;
 import com.koushikdutta.async.http.server.AsyncProxyServer;
 import com.koushikdutta.async.http.server.HttpServerRequestCallback;
+import com.koushikdutta.async.util.StreamUtility;
 import com.koushikdutta.ion.Ion;
 import com.koushikdutta.ion.cookie.CookieMiddleware;
 
@@ -32,9 +33,21 @@ import java.util.concurrent.TimeUnit;
  * Created by koush on 5/22/13.
  */
 public class HttpTests extends AndroidTestCase {
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        Ion.getDefault(getContext())
+        .configure().setLogging("HttpTests", Log.VERBOSE);
+    }
+
     public void testString() throws Exception {
-        assertNotNull(Ion.with(getContext()).load("https://raw.github.com/koush/AndroidAsync/master/AndroidAsyncTest/testdata/test.json")
+        assertNotNull(Ion.with(getContext()).load("https://raw.githubusercontent.com/koush/AndroidAsync/master/AndroidAsync/test/assets/test.json")
         .asString().get());
+    }
+
+    public void testInputStream() throws Exception {
+        assertNotNull(StreamUtility.readToEnd(Ion.with(getContext()).load("https://raw.githubusercontent.com/koush/AndroidAsync/master/AndroidAsync/test/assets/test.json")
+        .asInputStream().get()));
     }
 
     public void testMultipartFileContentType() throws Exception {
@@ -139,7 +152,7 @@ public class HttpTests extends AndroidTestCase {
         }
         assertTrue(ion.getCookieMiddleware().getCookieManager().get(URI.create("http://www.google.com/test/path"), new Multimap()).size() > 0);
 
-        CookieMiddleware deserialize = new CookieMiddleware(getContext(), ion.getDefault(getContext()).getName());
+        CookieMiddleware deserialize = new CookieMiddleware(ion);
         assertTrue(deserialize.getCookieManager().get(URI.create("http://www.google.com/test/path"), new Multimap()).size() > 0);
     }
 
